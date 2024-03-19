@@ -12,22 +12,22 @@
             <PatternLayout pattern="${TEST_PATTERN}"/>
         </Console>
 
-        <RollingFile name ="RollingFileAppender">
-            <FileName>${LOG_PATH}/log4j2.log</FileName>
-            <FilePattern>${LOG_PATH}/log4j2.%d{yyyy-MM-dd-hh-mm}.%i.log.gz</FilePattern>
-            <PatternLayout>
-                <Pattern>${DEFAULT_PATTERN}</Pattern>
-            </PatternLayout>
-            <Policies>
-                <SizeBasedTriggeringPolicy size="100MB"/>
-                <TimeBasedTriggeringPolicy interval = "1" modulate = "true"/>
-            </Policies>
-            <DefaultRolloverStrategy>
-                <Delete basePath="${LOG_PATH}" maxDepth="1">
-                    <IfAccumulatedFileCount exceeds="3"/>
-                </Delete>
-            </DefaultRolloverStrategy>
-        </RollingFile>
+<!--        <RollingFile name ="RollingFileAppender">-->
+<!--            <FileName>${LOG_PATH}/log4j2.log</FileName>-->
+<!--            <FilePattern>${LOG_PATH}/log4j2.%d{yyyy-MM-dd-hh-mm}.%i.log.gz</FilePattern>-->
+<!--            <PatternLayout>-->
+<!--                <Pattern>${DEFAULT_PATTERN}</Pattern>-->
+<!--            </PatternLayout>-->
+<!--            <Policies>-->
+<!--                <SizeBasedTriggeringPolicy size="100MB"/>-->
+<!--                <TimeBasedTriggeringPolicy interval = "1" modulate = "true"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy>-->
+<!--                <Delete basePath="${LOG_PATH}" maxDepth="1">-->
+<!--                    <IfAccumulatedFileCount exceeds="3"/>-->
+<!--                </Delete>-->
+<!--            </DefaultRolloverStrategy>-->
+<!--        </RollingFile>-->
 
     </Appenders>
 

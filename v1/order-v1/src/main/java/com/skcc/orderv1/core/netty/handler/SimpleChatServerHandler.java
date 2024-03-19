@@ -17,6 +17,10 @@ package com.skcc.orderv1.core.netty.handler;
 
 import com.skcc.orderv1.core.netty.domain.ChannelRepository;
 import com.skcc.orderv1.core.netty.domain.User;
+import com.skcc.orderv1.domain.data.OrderCreateRequest;
+import com.skcc.orderv1.domain.data.OrderCreateResponse;
+import com.skcc.orderv1.domain.service.OrderService;
+import com.skcc.orderv1.global.ObjectMapperConverter;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -24,6 +28,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.concurrent.*;
 
 /**
  * event handler to process receiving messages
@@ -37,6 +45,10 @@ import org.springframework.util.Assert;
 public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
 
     private final ChannelRepository channelRepository;
+    private final ObjectMapperConverter objectMapper;
+
+    private final OrderService orderService;
+
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -56,21 +68,21 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         String stringMessage = (String) msg;
         log.info("stringMessage={}", stringMessage);
-        if ( stringMessage.startsWith("login ")) {
-            ctx.fireChannelRead(msg);
-            return;
+
+        Object object = objectMapper.stringToObject(stringMessage, OrderCreateRequest.class);
+
+        if (object != null) {
+            OrderCreateRequest orderCreateRequest = (OrderCreateRequest) object;
+            log.info("{} -> Paging ret = {}", Thread.currentThread().getName(), orderCreateRequest);
+            orderService.createOrderSocket(orderCreateRequest);
+            ctx.channel().writeAndFlush("ok" + "\n\r");
+        }
+        else{
+            ctx.channel().writeAndFlush("error" + "\n\r");
         }
 
-        String[] splitMessage = stringMessage.split("::");
-
-        log.info("test");
-        if (splitMessage.length != 2) {
-            ctx.channel().writeAndFlush(stringMessage + "\n\r");
-            return;
-        }
-
-        User.current(ctx.channel())
-                .tell(channelRepository.get(splitMessage[0]), splitMessage[0], splitMessage[1]);
+//        User.current(ctx.channel())
+//                .tell(channelRepository.get(splitMessage[0]), splitMessage[0], splitMessage[1]);
     }
 
     @Override

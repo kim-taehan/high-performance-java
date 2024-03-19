@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class SimpleChatChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SimpleChatServerHandler simpleChatServerHandler;
-    private final LoginHandler loginHandler;
+//    private final LoginHandler loginHandler;
     private final StringEncoder stringEncoder = new StringEncoder();
     private final StringDecoder stringDecoder = new StringDecoder();
 
@@ -49,6 +49,6 @@ public class SimpleChatChannelInitializer extends ChannelInitializer<SocketChann
         pipeline.addLast(stringDecoder);
         pipeline.addLast(stringEncoder);
         pipeline.addLast(simpleChatServerHandler);
-        pipeline.addLast(loginHandler);
+//        pipeline.addLast(loginHandler);
     }
 }

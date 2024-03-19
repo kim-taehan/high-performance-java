@@ -17,8 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,18 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
     private final RestTemplateCall restTemplateCall;
 
     private final ObjectMapperConverter objectConverter;
+
+    private ExecutorService executorService;
+    @PostConstruct
+    void init() {
+        executorService = new ThreadPoolExecutor(
+                3, // 코어 쓰레드 수
+                200, // 최대 쓰레드 수
+                120, // 최대 유휴 시간
+                TimeUnit.SECONDS, // 최대 유휴 시간 단위
+                new SynchronousQueue<>() // 작업 큐
+        );
+    }
 
     @Override
     @Transactional
@@ -54,12 +68,21 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
 
     @Override
     public String createOrderSocket(OrderCreateRequest request) {
+        String orderNo = createOrderNO();
+        CompletableFuture.runAsync(()->{
+            log.info("CompletableFuture.runAsync={}", Thread.currentThread().getName());
+            int insertCount = insertOrder(request, orderNo);
 
-        String uuid = createOrderNO();
-        int insertCount = insertOrder(request, uuid);
-        log.info("insertCount={}", insertCount);
+            ObjectNode objectNode = ((ObjectNode) objectConverter.javaObjToJsonNode(request)).put("orderNo", orderNo);
 
-        return uuid;
+            String stockRequest = objectNode.toString();
+
+            log.info("stockRequest = {}", stockRequest);
+
+
+
+        },executorService);
+        return orderNo;
     }
 
     private void updateOrderStatus(String uuid, OrderStatus orderStatus, String message) {

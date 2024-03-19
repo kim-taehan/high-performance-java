@@ -1,10 +1,13 @@
 package com.skcc.orderv1.global;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class ObjectMapperConverter {
 
     private final ObjectMapper objectMapper;
@@ -23,4 +26,14 @@ public class ObjectMapperConverter {
     public JsonNode createJsonNod() {
         return objectMapper.createObjectNode();
     }
+
+    public Object stringToObject(String jsonText, Class<?> classType) {
+        try {
+            return objectMapper.readValue(jsonText, classType);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
 }

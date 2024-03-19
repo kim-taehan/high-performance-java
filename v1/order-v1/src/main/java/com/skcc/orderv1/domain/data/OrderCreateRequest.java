@@ -1,13 +1,17 @@
 package com.skcc.orderv1.domain.data;
 
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderCreateRequest {
 
-    private final Item item;
-    private final Integer count;
+    private Item item;
+    private Integer count;
+
+
 }
