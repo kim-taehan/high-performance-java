@@ -9,6 +9,7 @@ import com.skcc.orderv1.domain.data.OrderStatus;
 import com.skcc.orderv1.domain.mapper.OrderRepository;
 import com.skcc.orderv1.domain.service.OrderService;
 import com.skcc.orderv1.global.ObjectMapperConverter;
+import com.skcc.orderv1.global.queue.MessageProducer;
 import com.skcc.orderv1.global.rest.RestTemplateCall;
 import com.skcc.orderv1.global.rest.RiskResponseCode;
 import com.skcc.orderv1.global.rest.RiskUrl;
@@ -33,7 +34,10 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
 
     private final ObjectMapperConverter objectConverter;
 
+    private final MessageProducer messageProducer;
+
     private ExecutorService executorService;
+
     @PostConstruct
     void init() {
         executorService = new ThreadPoolExecutor(
@@ -57,7 +61,7 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
         ObjectNode objectNode = ((ObjectNode) stockRequest).put("orderNo", orderNo);
         RiskResponseCode responseCode = restTemplateCall.call(objectNode, RiskUrl.ORDER);
         if (responseCode == RiskResponseCode.S200) {
-            updateOrderStatus(orderNo, OrderStatus.COMPLETE, "정상처리됨");
+            updateOrderStatus(orderNo, OrderStatus.COMPLETE, responseCode.value());
         }
         else {
             updateOrderStatus(orderNo, OrderStatus.FAILED, responseCode.value());
@@ -78,14 +82,16 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
             String stockRequest = objectNode.toString();
 
             log.info("stockRequest = {}", stockRequest);
-
-
+            messageProducer.sendMessage(stockRequest);
+            log.info("kafka send message");
 
         },executorService);
         return orderNo;
     }
 
-    private void updateOrderStatus(String uuid, OrderStatus orderStatus, String message) {
+    @Override
+    @Transactional
+    public void updateOrderStatus(String uuid, OrderStatus orderStatus, String message) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("orderNo", uuid);
         params.put("orderStatus", orderStatus);

@@ -58,6 +58,10 @@ dependencies {
 
 	implementation 'io.netty:netty-all:4.1.42.Final'
 
+
+	implementation 'org.springframework.kafka:spring-kafka'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
 }
 
 tasks.named('test') {

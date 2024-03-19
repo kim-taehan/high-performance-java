@@ -24,6 +24,17 @@ spring:
       max-lifetime: 30000 # maximum lifetime in milliseconds of a connection in the pool after it is closed.
       auto-commit: false #default auto-commit behavior.
 
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      acks: all
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+      type: SINGLE
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: order-group
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
