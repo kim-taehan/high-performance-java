@@ -53,12 +53,12 @@ public class MapperConfig {
 
         PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactoryBean.setConfigLocation(
-                pathMatchingResourcePatternResolver.getResource("classpath:/egovcore/mapper/config/mapper-config.xml"));
+                pathMatchingResourcePatternResolver.getResource("classpath:/mapper/config/mapper-config.xml"));
 
         try {
             sqlSessionFactoryBean.setMapperLocations(
                     pathMatchingResourcePatternResolver
-                            .getResources("classpath:/egovcore/mapper/domain/**/*.xml"));
+                            .getResources("classpath:/mapper/domain/**/*.xml"));
         } catch (IOException e) {
             // TODO Exception 처리 필요
         }

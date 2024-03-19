@@ -1,0 +1,2 @@
+[2024-03-19 21:05:06.539]  INFO 25492 --- [nio-9999-exec-1] c.s.s.d.s.i.StockServiceImpl             : select -> item=AMERICANO, Count=885
+[2024-03-19 21:05:07.344]  INFO 25492 --- [nio-9999-exec-2] c.s.s.d.s.i.StockServiceImpl             : select -> item=AMERICANO, Count=885

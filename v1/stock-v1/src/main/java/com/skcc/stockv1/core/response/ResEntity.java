@@ -20,6 +20,12 @@ public class ResEntity <T> {
         this.message = "정상처리 되었습니다.";
     }
 
+    public ResEntity(@Nullable T body, String message) {
+        this.body = body;
+        this.code = "E001";
+        this.message = message;
+    }
+
     @Builder
     public ResEntity(@Nullable T body, PageDto page, String code, String message) {
         this.body = body;

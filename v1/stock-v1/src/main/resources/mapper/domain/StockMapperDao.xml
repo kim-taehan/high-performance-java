@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StockMapperDao">
+
+    <select id="selectItemCount" resultType ="int" parameterType="string">
+        SELECT stock.STOCK_COUNT
+        FROM STOCK AS stock
+        WHERE stock.item = #{item}
+    </select>
+
+    <update id="updateItemCount" parameterType="map">
+        UPDATE STOCK
+        SET STOCK_COUNT = #{stockCount}
+        WHERE ITEM = #{item}
+    </update>
+
+</mapper>

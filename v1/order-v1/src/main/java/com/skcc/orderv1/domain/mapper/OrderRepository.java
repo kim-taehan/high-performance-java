@@ -15,4 +15,8 @@ public class OrderRepository extends EgovAbstractMapper {
         return insert(INSERT_ORDER, param);
     }
 
+    public int updateOrderStatus(Map param) {
+        return update(UPDATE_ORDER_STATUS, param);
+    }
+
 }

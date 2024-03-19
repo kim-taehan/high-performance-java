@@ -13,7 +13,11 @@
 
     <update id="updateOrderStatus" parameterType="map">
         UPDATE ORDERS
-        SET ORDER_STATUS = #{orderStatus}
+        SET
+            ORDER_STATUS = #{orderStatus}
+            <if test="message!=null and message!=''">
+                , MESSAGE = #{message}
+            </if>
         WHERE ORDER_NO = #{orderNo}
     </update>
 

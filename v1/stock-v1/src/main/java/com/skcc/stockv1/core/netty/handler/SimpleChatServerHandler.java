@@ -17,7 +17,6 @@ package com.skcc.stockv1.core.netty.handler;
 
 import com.skcc.stockv1.core.netty.domain.ChannelRepository;
 import com.skcc.stockv1.core.netty.domain.User;
-import com.skcc.stockv1.domain.orders.service.impl.AsyncService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -39,7 +38,6 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
 
     private final ChannelRepository channelRepository;
 
-    private final AsyncService asyncService;
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Assert.notNull(this.channelRepository, "[Assertion failed] - ChannelRepository is required; it must not be null");
@@ -64,8 +62,6 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
         }
 
         String[] splitMessage = stringMessage.split("::");
-
-        asyncService.findAll();
 
 
         log.info("test");
