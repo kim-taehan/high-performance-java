@@ -1,0 +1,33 @@
+logging:
+  config: classpath:log4j2.xml
+
+server:
+  port: 9999
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order-stock
+    username: atworks
+    password: atworks
+#    mapper-locations: classpath:/mapper/**/*.xml
+    hikari:
+      connection-timeout: 30000 #maximum number of milliseconds that a client will wait for a connection
+      minimum-idle: 20 #minimum number of idle connections maintained by HikariCP in a connection pool
+      maximum-pool-size: 20 #maximum pool size
+      idle-timeout: 10000 #maximum idle time for connection
+      max-lifetime: 30000 # maximum lifetime in milliseconds of a connection in the pool after it is closed.
+      auto-commit: false #default auto-commit behavior.
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+netty:
+  tcp-port: 8090
+  netty.boss-count: 1
+  netty.worker-count: 10
+  netty.keep-alive: true
+  netty.backlog: 100
