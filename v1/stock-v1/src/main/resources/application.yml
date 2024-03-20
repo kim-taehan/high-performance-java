@@ -9,8 +9,8 @@ server:
 
 spring:
   main:
-#    web-application-type: none
-    web-application-type: servlet
+    web-application-type: none
+#    web-application-type: servlet
   datasource:
     url: jdbc:postgresql://localhost:5432/order-stock
     username: atworks
@@ -48,6 +48,6 @@ netty:
 
 thread:
   configuration:
-    core-pool-size: 3
+    core-pool-size: 10
     maximumPoolSize: 200
     keepAliveTime: 120

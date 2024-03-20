@@ -45,7 +45,7 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
         log.info(ctx.channel().remoteAddress() + "");
         String remoteAddress = ctx.channel().remoteAddress().toString();
 
-        ctx.writeAndFlush("Your remote address is " + remoteAddress + ".\r\n");
+//        ctx.writeAndFlush("Your remote address is " + remoteAddress + ".\r\n");
 
 
     }

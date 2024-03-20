@@ -58,7 +58,7 @@ public class StockServiceImpl extends SkAbstractService implements StockService 
         int updateItemCount = stockRepository.updateItemCount(params);
         log.info("[stock update] -> item={}, Count={}", request.getItem(), itemCount - request.getCount());
 
-        timeout(100);
+//        timeout(100);
         return true;
     }
 
