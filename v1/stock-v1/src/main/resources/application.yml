@@ -8,6 +8,9 @@ server:
       enabled: false
 
 spring:
+  main:
+#    web-application-type: none
+    web-application-type: servlet
   datasource:
     url: jdbc:postgresql://localhost:5432/order-stock
     username: atworks
@@ -42,3 +45,9 @@ netty:
   netty.worker-count: 10
   netty.keep-alive: true
   netty.backlog: 100
+
+thread:
+  configuration:
+    core-pool-size: 3
+    maximumPoolSize: 200
+    keepAliveTime: 120

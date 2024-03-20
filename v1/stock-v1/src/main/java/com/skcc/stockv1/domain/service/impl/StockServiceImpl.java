@@ -23,21 +23,8 @@ public class StockServiceImpl extends SkAbstractService implements StockService 
 
     private final StockRepository stockRepository;
 
-    private final MessageProducer messageProducer;
     private final ObjectMapperConverter objectMapperConverter;
 
-    private ExecutorService executorService;
-
-    @PostConstruct
-    void init() {
-        executorService = new ThreadPoolExecutor(
-                3, // 코어 쓰레드 수
-                200, // 최대 쓰레드 수
-                120, // 최대 유휴 시간
-                TimeUnit.SECONDS, // 최대 유휴 시간 단위
-                new SynchronousQueue<>() // 작업 큐
-        );
-    }
 
     @Transactional
     @Override
@@ -46,19 +33,15 @@ public class StockServiceImpl extends SkAbstractService implements StockService 
     }
 
     @Override
-    public boolean checkStockKafka(StockRequest request) {
+    @Transactional
+    public String checkStockKafka(StockRequest request) {
+        boolean ret = synchronizedProcess(request);
 
-        CompletableFuture.runAsync(()->{
+        ObjectNode objectNode = objectMapperConverter.createObjectNode();
+        objectNode.put("orderNo", request.getOrderNo());
+        objectNode.put("code", ret ? "0000" : "E001");
 
-            boolean ret = synchronizedProcess(request);
-
-            ObjectNode objectNode = objectMapperConverter.createObjectNode();
-            objectNode.put("orderNo", request.getOrderNo());
-            objectNode.put("code", ret ? "0000" : "E001");
-
-            messageProducer.sendMessage(objectNode.toString());
-        },executorService);
-        return false;
+        return objectNode.toString();
     }
 
     private synchronized boolean synchronizedProcess(StockRequest request) {

@@ -1,4 +1,4 @@
-package com.skcc.orderv1.global.config;
+package com.skcc.orderv1.global.thread;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

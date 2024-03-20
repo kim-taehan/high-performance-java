@@ -5,5 +5,5 @@ import com.skcc.stockv1.domain.data.StockRequest;
 public interface StockService {
 
     boolean checkStock(StockRequest request);
-    boolean checkStockKafka(StockRequest request);
+    String  checkStockKafka(StockRequest request);
 }

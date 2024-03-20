@@ -15,8 +15,11 @@
  */
 package com.skcc.orderv1.core.netty.config;
 
-import com.skcc.orderv1.core.netty.domain.ChannelRepository;
+import com.skcc.orderv1.core.netty.NettyServer;
 import com.skcc.orderv1.core.netty.handler.SimpleChatChannelInitializer;
+import com.skcc.orderv1.core.netty.handler.SimpleChatServerHandler;
+import com.skcc.orderv1.global.ObjectMapperConverter;
+import com.skcc.orderv1.global.thread.ExecutorServiceFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -24,6 +27,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,9 +42,18 @@ import java.net.InetSocketAddress;
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(NettyProperties.class)
+@ConditionalOnProperty(value = "spring.main.web-application-type", havingValue = "none")
 public class NettyConfiguration {
 
     private final NettyProperties nettyProperties;
+    @Bean
+    public SimpleChatChannelInitializer simpleChatChannelInitializer(SimpleChatServerHandler simpleChatServerHandler) {
+        return new SimpleChatChannelInitializer(simpleChatServerHandler);
+    }
+    @Bean
+    public SimpleChatServerHandler simpleChatServerHandler(ObjectMapperConverter converter, ExecutorServiceFactory factory) {
+        return new SimpleChatServerHandler(converter, factory);
+    }
 
     @Bean(name = "serverBootstrap")
     public ServerBootstrap bootstrap(SimpleChatChannelInitializer simpleChatChannelInitializer) {
@@ -69,7 +82,8 @@ public class NettyConfiguration {
     }
 
     @Bean
-    public ChannelRepository channelRepository() {
-        return new ChannelRepository();
+    public NettyServer nettyServer(ServerBootstrap bootstrap, InetSocketAddress tcpSocketAddress) {
+        return new NettyServer(bootstrap, tcpSocketAddress);
     }
+
 }

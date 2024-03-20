@@ -12,7 +12,6 @@ import java.net.InetSocketAddress;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
 public class NettyServer {
 
     private final ServerBootstrap serverBootstrap;

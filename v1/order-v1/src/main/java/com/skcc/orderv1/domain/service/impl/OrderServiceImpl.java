@@ -36,9 +36,6 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
 
     private final ObjectMapperConverter objectConverter;
 
-    private final MessageProducer messageProducer;
-
-    private final ExecutorService executorService;
 
     @Override
     @Transactional
@@ -62,16 +59,14 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
 
 
     @Override
+    @Transactional
     public String createOrderSocket(OrderCreateRequest request) {
         String orderNo = createOrderNO();
+        int insertCount = insertOrder(request, orderNo, TCP);
+        ObjectNode objectNode = ((ObjectNode) objectConverter.javaObjToJsonNode(request)).put("orderNo", orderNo);
+        String stockRequest = objectNode.toString();
 
-        CompletableFuture.runAsync(()->{
-            int insertCount = insertOrder(request, orderNo, TCP);
-            ObjectNode objectNode = ((ObjectNode) objectConverter.javaObjToJsonNode(request)).put("orderNo", orderNo);
-            String stockRequest = objectNode.toString();
-            messageProducer.sendMessage(stockRequest);
-        },executorService);
-        return orderNo;
+        return stockRequest;
     }
 
     @Override

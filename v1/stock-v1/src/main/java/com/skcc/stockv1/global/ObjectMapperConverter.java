@@ -31,7 +31,7 @@ public class ObjectMapperConverter {
         return objectMapper.createObjectNode();
     }
 
-    public Object stringToObject(String jsonText, Class<?> classType) {
+    public <T> T stringToObject(String jsonText, Class<T> classType) {
         try {
             return objectMapper.readValue(jsonText, classType);
         } catch (JsonProcessingException e) {

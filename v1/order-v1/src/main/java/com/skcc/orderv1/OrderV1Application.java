@@ -1,7 +1,10 @@
 package com.skcc.orderv1;
 
 import com.skcc.orderv1.core.netty.NettyServer;
-import com.skcc.orderv1.global.config.ThreadProperty;
+import com.skcc.orderv1.domain.service.OrderService;
+import com.skcc.orderv1.global.thread.ExecutorServiceFactory;
+import com.skcc.orderv1.global.thread.ThreadProperty;
+import com.skcc.orderv1.global.kafka.MessageProducer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,12 +18,20 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static org.springframework.boot.Banner.Mode.OFF;
+
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class OrderV1Application {
 
+
 	public static void main(String[] args) {
-		SpringApplication.run(OrderV1Application.class, args);
+
+		SpringApplication application = new SpringApplication(OrderV1Application.class);
+		// 스프링부트 웰컴 메시지 관리
+		application.setBannerMode(OFF);
+
+		application.run(args);
 	}
 
 	/**
@@ -53,4 +64,11 @@ public class OrderV1Application {
 				new SynchronousQueue<>() // 작업 큐
 		);
 	}
+
+	@Bean
+	@ConditionalOnProperty(value = "spring.main.web-application-type", havingValue = "none")
+	public ExecutorServiceFactory executorServiceFactory(ExecutorService executorService, OrderService orderService, MessageProducer messageProducer) {
+		return new ExecutorServiceFactory(executorService, orderService, messageProducer);
+	}
+
 }
