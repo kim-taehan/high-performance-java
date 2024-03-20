@@ -6,9 +6,9 @@
     <insert id="insertOrder" parameterType="map" >
         INSERT
         INTO ORDERS
-        (ORDER_NO, ORDER_STATUS, ITEM, COUNT, CREATED_DATE, MODIFIED_DATE)
+        (ORDER_NO, ORDER_STATUS, ITEM, COUNT, CALL_METHOD, CREATED_DATE, MODIFIED_DATE)
         VALUES
-        (#{orderNo}, #{orderStatus}, #{item}, #{count}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        (#{orderNo}, #{orderStatus}, #{item}, #{count}, #{callMethod}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     </insert>
 
     <update id="updateOrderStatus" parameterType="map">
@@ -18,6 +18,7 @@
             <if test="message!=null and message!=''">
                 , MESSAGE = #{message}
             </if>
+            , MODIFIED_DATE = CURRENT_TIMESTAMP
         WHERE ORDER_NO = #{orderNo}
     </update>
 

@@ -64,17 +64,15 @@ public class SimpleChatServerHandler extends ChannelInboundHandlerAdapter {
 
     }
 
+    private final String CALL_LOG_TEXT = "CALL 상품주문 (호출방식:TCP)";
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         String stringMessage = (String) msg;
-        log.info("stringMessage={}", stringMessage);
 
-        Object object = objectMapper.stringToObject(stringMessage, OrderCreateRequest.class);
-
-        if (object != null) {
-            OrderCreateRequest orderCreateRequest = (OrderCreateRequest) object;
-            log.info("{} -> Paging ret = {}", Thread.currentThread().getName(), orderCreateRequest);
-            orderService.createOrderSocket(orderCreateRequest);
+        OrderCreateRequest request = objectMapper.stringToObject(stringMessage, OrderCreateRequest.class);
+        log.info("{}={}", CALL_LOG_TEXT, request);
+        if (request != null) {
+            orderService.createOrderSocket(request);
             ctx.channel().writeAndFlush("ok" + "\n\r");
         }
         else{

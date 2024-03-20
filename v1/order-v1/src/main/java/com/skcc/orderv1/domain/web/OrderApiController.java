@@ -19,8 +19,11 @@ public class OrderApiController {
 
     private final OrderService orderService;
 
+    private final String CALL_LOG_TEXT = "CALL 상품주문 (호출방식:HTTP)";
+
     @PostMapping("/api/v1/orders")
     public ResEntity<OrderCreateResponse> createOrder(@RequestBody OrderCreateRequest request) {
+        log.info("{}={}", CALL_LOG_TEXT, request);
         return ResEntity.ok(orderService.createOrderHttp(request));
     }
 }

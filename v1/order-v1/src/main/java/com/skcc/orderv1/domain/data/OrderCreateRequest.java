@@ -13,5 +13,11 @@ public class OrderCreateRequest {
     private Item item;
     private Integer count;
 
-
+    @Override
+    public String toString() {
+        return "OrderCreateRequest{" +
+                "item=" + item +
+                ", count=" + count +
+                '}';
+    }
 }

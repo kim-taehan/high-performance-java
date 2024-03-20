@@ -18,12 +18,12 @@ public class StockApiController {
 
     private final StockService stockService;
 
+    private final String CALL_LOG_TEXT = "CALL 재고확인 (호출방식:HTTP)";
     @PostMapping("/api/v1/stocks")
     public ResEntity<String> checkStock(@RequestBody StockRequest request) {
+        log.info("{}={}", CALL_LOG_TEXT, request);
         boolean ret = stockService.checkStock(request);
-        if (ret) {
-            return ResEntity.ok(request.getOrderNo());
-        }
-        return new ResEntity<>(request.getOrderNo(), "재고부족");
+        return ret ? ResEntity.ok(request.getOrderNo())
+                : new ResEntity<>(request.getOrderNo(), "재고부족");
     }
 }

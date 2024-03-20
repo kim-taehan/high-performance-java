@@ -1,4 +1,4 @@
-package com.skcc.stockv1.global.queue;
+package com.skcc.orderv1.global.kafka;
 
 
 import lombok.RequiredArgsConstructor;
@@ -13,13 +13,10 @@ public class MessageProducer {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static String TOPIC_NAME = "order-topic";
+    private static String TOPIC_NAME = "stock-topic";
 
-    public String sendMessage(String message) {
-        String messageData = "kafka message (stock->order)";
-
-        log.info("kafka sendMessage={}", message);
+    public void sendMessage(String message) {
+        log.info("[kafka sendMessage]={}, {}", TOPIC_NAME, message);
         kafkaTemplate.send(TOPIC_NAME, message);
-        return "success.";
     }
 }

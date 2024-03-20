@@ -41,11 +41,17 @@ mybatis:
 
 netty:
   tcp-port: 8888
-  netty.boss-count: 1
-  netty.worker-count: 10
-  netty.keep-alive: true
-  netty.backlog: 100
+  boss-count: 1
+  worker-count: 10
+  keep-alive: true
+  backlog: 100
 
 
 risk:
   url: http://localhost:9999
+
+thread:
+  configuration:
+    core-pool-size: 3
+    maximumPoolSize: 200
+    keepAliveTime: 120

@@ -6,7 +6,7 @@ import com.skcc.stockv1.domain.data.StockRequest;
 import com.skcc.stockv1.domain.repository.StockRepository;
 import com.skcc.stockv1.domain.service.StockService;
 import com.skcc.stockv1.global.ObjectMapperConverter;
-import com.skcc.stockv1.global.queue.MessageProducer;
+import com.skcc.stockv1.global.kafka.MessageProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,6 @@ public class StockServiceImpl extends SkAbstractService implements StockService 
     public boolean checkStockKafka(StockRequest request) {
 
         CompletableFuture.runAsync(()->{
-            log.info("CompletableFuture.runAsync={}", Thread.currentThread().getName());
 
             boolean ret = synchronizedProcess(request);
 
@@ -58,7 +57,6 @@ public class StockServiceImpl extends SkAbstractService implements StockService 
             objectNode.put("code", ret ? "0000" : "E001");
 
             messageProducer.sendMessage(objectNode.toString());
-            log.info("kafka send message");
         },executorService);
         return false;
     }
@@ -66,15 +64,16 @@ public class StockServiceImpl extends SkAbstractService implements StockService 
     private synchronized boolean synchronizedProcess(StockRequest request) {
 
         int itemCount = stockRepository.findItemCount(request.getItem().name());
-        log.info("select -> item={}, Count={}", request.getItem(), itemCount);
+        
         if (request.getCount() > itemCount) {
+            log.info("[재고부족] -> item={}, Count={}", request.getItem(), itemCount);
             return false;
         }
         HashMap<String,Object> params = new HashMap<>();
         params.put("stockCount", itemCount - request.getCount());
         params.put("item", request.getItem());
         int updateItemCount = stockRepository.updateItemCount(params);
-        log.info("update -> item={}, Count={}", request.getItem(), itemCount - request.getCount());
+        log.info("[stock update] -> item={}, Count={}", request.getItem(), itemCount - request.getCount());
 
         timeout(100);
         return true;

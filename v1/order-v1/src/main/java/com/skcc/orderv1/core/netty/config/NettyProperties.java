@@ -16,8 +16,10 @@
 package com.skcc.orderv1.core.netty.config;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -29,26 +31,29 @@ import javax.validation.constraints.Size;
  * @author Jibeom Jung akka. Manty
  */
 @Getter
-@Setter
+@ConstructorBinding
 @ConfigurationProperties(prefix = "netty")
+@RequiredArgsConstructor
 public class NettyProperties {
+
     @NotNull
     @Size(min=1000, max=65535)
-    private int tcpPort;
+    private final int tcpPort;
 
     @NotNull
     @Min(1)
-    private int bossCount;
+    private final int bossCount;
 
     @NotNull
     @Min(2)
-    private int workerCount;
+    private final int workerCount;
 
     @NotNull
-    private boolean keepAlive;
+    private final boolean keepAlive;
 
     @NotNull
-    private int backlog;
+    private final int backlog;
+
 
     @Override
     public String toString() {

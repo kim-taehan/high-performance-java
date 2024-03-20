@@ -3,13 +3,14 @@ package com.skcc.orderv1.domain.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.skcc.orderv1.core.mvc.service.SkAbstractService;
+import com.skcc.orderv1.domain.data.CallMethod;
 import com.skcc.orderv1.domain.data.OrderCreateRequest;
 import com.skcc.orderv1.domain.data.OrderCreateResponse;
 import com.skcc.orderv1.domain.data.OrderStatus;
 import com.skcc.orderv1.domain.mapper.OrderRepository;
 import com.skcc.orderv1.domain.service.OrderService;
 import com.skcc.orderv1.global.ObjectMapperConverter;
-import com.skcc.orderv1.global.queue.MessageProducer;
+import com.skcc.orderv1.global.kafka.MessageProducer;
 import com.skcc.orderv1.global.rest.RestTemplateCall;
 import com.skcc.orderv1.global.rest.RiskResponseCode;
 import com.skcc.orderv1.global.rest.RiskUrl;
@@ -18,10 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.*;
+
+import static com.skcc.orderv1.domain.data.CallMethod.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,25 +38,14 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
 
     private final MessageProducer messageProducer;
 
-    private ExecutorService executorService;
-
-    @PostConstruct
-    void init() {
-        executorService = new ThreadPoolExecutor(
-                3, // 코어 쓰레드 수
-                200, // 최대 쓰레드 수
-                120, // 최대 유휴 시간
-                TimeUnit.SECONDS, // 최대 유휴 시간 단위
-                new SynchronousQueue<>() // 작업 큐
-        );
-    }
+    private final ExecutorService executorService;
 
     @Override
     @Transactional
     public OrderCreateResponse createOrderHttp(OrderCreateRequest request) {
 
         String orderNo = createOrderNO();
-        int insertCount = insertOrder(request, orderNo);
+        int insertCount = insertOrder(request, orderNo, HTTP);
 
         // rm http call
         JsonNode stockRequest = objectConverter.javaObjToJsonNode(request);
@@ -73,18 +64,12 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
     @Override
     public String createOrderSocket(OrderCreateRequest request) {
         String orderNo = createOrderNO();
+
         CompletableFuture.runAsync(()->{
-            log.info("CompletableFuture.runAsync={}", Thread.currentThread().getName());
-            int insertCount = insertOrder(request, orderNo);
-
+            int insertCount = insertOrder(request, orderNo, TCP);
             ObjectNode objectNode = ((ObjectNode) objectConverter.javaObjToJsonNode(request)).put("orderNo", orderNo);
-
             String stockRequest = objectNode.toString();
-
-            log.info("stockRequest = {}", stockRequest);
             messageProducer.sendMessage(stockRequest);
-            log.info("kafka send message");
-
         },executorService);
         return orderNo;
     }
@@ -97,16 +82,20 @@ public class OrderServiceImpl extends SkAbstractService implements OrderService 
         params.put("orderStatus", orderStatus);
         params.put("message", message);
         int updateCount = orderRepository.updateOrderStatus(params);
-        log.info("updateCount = {}", updateCount);;
+        log.info("[update order status] count={}", orderStatus);
     }
 
-    private int insertOrder(OrderCreateRequest request, String uuid) {
+    private int insertOrder(OrderCreateRequest request, String uuid, CallMethod callMethod) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("orderNo", uuid);
         params.put("item", request.getItem());
         params.put("count", request.getCount());
         params.put("orderStatus", OrderStatus.PENDING);
-        return orderRepository.insertOrder(params);
+        params.put("callMethod", callMethod);
+        int ret = orderRepository.insertOrder(params);
+
+        log.info("[insert order] count={}", ret);
+        return ret;
     }
 
     private static String createOrderNO() {
